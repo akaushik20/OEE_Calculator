@@ -20,7 +20,39 @@ def main():
     
     st.text("All Time: 24*60 = 1440 Minutes")
 
-    st.button("Calculate OEE", key="calculate_oee")
+    values = {
+        "Demand Per Annum": demand_annual,
+        "Production Per Day": production,
+        "Scheduled Time(3 shifts, 8 hours)": scheduled_time,
+        "OEE Loss Target(Assumption) %": oee_loss
+    }
+
+    calculate=st.button("Calculate OEE", key="calculate_oee")
+    
+    return calculate, values
+
+
+def calculate_oee(demand_annual, production, scheduled_time, oee_loss):
+    # Calculate OEE based on the input data
+    demand_per_hour = demand_annual / 365 / 24
+    production_per_hour = production / scheduled_time
+    oee = (production_per_hour - demand_per_hour) / production_per_hour * (1 - oee_loss)
+    return oee
 
 if __name__ == "__main__":
-    main()
+    calculate_flg, values=main()
+
+    if calculate_flg:
+        # Get the input values
+        demand_annual = values["Demand Per Annum"]
+        production = values["Production Per Day"]
+        scheduled_time = values["Scheduled Time(3 shifts, 8 hours)"]
+        oee_loss = values["OEE Loss Target(Assumption) %"]
+
+        # Calculate OEE
+        oee = calculate_oee(demand_annual, production, scheduled_time, oee_loss)
+
+        # Display the result
+        st.subheader("OEE Result")
+        st.write(f"Overall Equipment Effectiveness (OEE): {oee:.2f}")
+        st.write("This is the OEE value based on the input data.")  
